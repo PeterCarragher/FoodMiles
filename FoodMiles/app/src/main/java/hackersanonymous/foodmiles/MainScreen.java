@@ -10,8 +10,7 @@ import android.widget.Button;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
-
-public class MainScreen extends Activity {
+public class MainScreen extends Activity{
 
     private Button mButton;
 
@@ -37,9 +36,17 @@ public class MainScreen extends Activity {
         IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
         if (scanResult != null) {
             String re = scanResult.getContents();
+            String str = scanResult.toString();
             Log.d("code", re);
+            Log.d("string", str);
         }
         // else continue with any other code you need in the method
+
+        String uri = "http://gepir.gs1.org/v32/xx/gtin.aspx?Lang=en-US";
+        RequestTask postRequest = new RequestTask();
+        //String result = postRequest.execute(uri);
+        //Log.d("result", result);
+
 
     }
 }
