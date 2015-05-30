@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="totalMiles">Total Miles: 0</string>
     <string name="app_name">FoodMiles</string>
     <string name="product">Bananas</string>
-    <string name="foodMiles">1920.4</string>
+    <string name="foodMiles">0</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_display_product">DisplayProduct</string>
 

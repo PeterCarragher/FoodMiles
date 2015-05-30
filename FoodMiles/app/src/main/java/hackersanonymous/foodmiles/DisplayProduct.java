@@ -16,6 +16,7 @@ public class DisplayProduct extends Activity {
     private TextView number;
     private Button add;
     private Button reject;
+    private double foodMiles_;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,15 +26,15 @@ public class DisplayProduct extends Activity {
         Intent i = getIntent();
         String postcode = i.getStringExtra("postcode");
         String location = "";
+        final double oldTotal = i.getDoubleExtra("currentTotal", 0);
         //NEED TO SET CURRENT LOCATION
 
         text = (TextView)findViewById(R.id.productText);
         text.setText("Item: " + postcode);
 
-        double foodMiles_;
         foodMiles_ = getDistance(location, postcode);
         String foodMiles = String.valueOf(foodMiles_);
-
+        final double newTotal = oldTotal + foodMiles_;
         number = (TextView)findViewById(R.id.foodMiles);
         number.setText("FoodMiles: " + foodMiles);
 
@@ -43,8 +44,7 @@ public class DisplayProduct extends Activity {
             public void onClick(View v) {
                 Intent i = new Intent(DisplayProduct.this, MainScreen.class);
                 //push data to table
-
-
+                i.putExtra("totalMiles", newTotal);
                 DisplayProduct.this.startActivity(i);
             }
         });
@@ -55,6 +55,7 @@ public class DisplayProduct extends Activity {
             public void onClick(View v) {
                 Intent i = new Intent(DisplayProduct.this, MainScreen.class);
                 //dont add anything to table
+                i.putExtra("totalMiles", oldTotal);
                 DisplayProduct.this.startActivity(i);
             }
         });
