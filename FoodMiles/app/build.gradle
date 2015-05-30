@@ -30,7 +30,7 @@ repositories {
 dependencies {
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    // Supports Android 4.0.3 and later (API level 15)
+    compile "org.jsoup:jsoup:1.8.1"
     compile 'com.journeyapps:zxing-android-embedded:2.0.1@aar'
 
     // Supports Android 2.1 and later (API level 7), but not optimal for later Android versions.
