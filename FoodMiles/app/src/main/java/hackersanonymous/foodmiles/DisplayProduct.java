@@ -118,7 +118,7 @@ public class DisplayProduct extends Activity {
         double distance = 1;
 
         GeoPoint foodLocation = getLocationFromAddress(postcode);
-        
+
 
         return distance;
 
