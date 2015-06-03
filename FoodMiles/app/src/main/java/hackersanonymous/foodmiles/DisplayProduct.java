@@ -113,7 +113,12 @@ public class DisplayProduct extends Activity {
         Location foodLocation = new Location(shopLocation);
         foodLocation.setLatitude(foodGeoPoint.getLatitudeE6());
         foodLocation.setLongitude(foodGeoPoint.getLongitudeE6());
-        float distance = (float)(shopLocation.distanceTo(foodLocation)/1609.344);
+        float distance = (float)(shopLocation.distanceTo(foodLocation));
+        double deltaLat = (shopLocation.getLatitude() - foodLocation.getLatitude());
+        double deltaLong = (shopLocation.getLongitude() - foodLocation.getLongitude());
+        double a = Math.pow(Math.sin(deltaLat/2), 2) + Math.cos(shopLocation.getLatitude())*Math.cos(foodLocation.getLatitude())*Math.pow(Math.sin(deltaLong), 2);
+        distance = (float)(6371*2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+
         return distance;
     }
 
