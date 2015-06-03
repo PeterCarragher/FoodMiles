@@ -55,7 +55,7 @@ public class MainScreen extends Activity{
         Intent i = getIntent();
         totalMiles = i.getDoubleExtra("totalMiles", 0);
         milesPerPound = (TextView)findViewById(R.id.totalMiles);
-        milesPerPound.setText("Total FoodMiles: " + String.valueOf(totalMiles));
+        milesPerPound.setText("Total FoodMiles:\n" + String.valueOf((int)totalMiles));
 
     }
 
@@ -158,22 +158,9 @@ public class MainScreen extends Activity{
 
             Intent i = new Intent(getApplicationContext(), DisplayProduct.class);
 
-           // Pattern pattern = Pattern.compile("[A-Z]{1,2}[0-9R][0-9A-Z]? [0-9][ABD-HJLNP-UW-Z]{2}");
-
-
             Document doc = Jsoup.parse(result);
             this.result = doc.text();
-            /*
-            Log.d("responce", result);
-            Element address = doc.select("div.addressscroll").first();
-            String divString = address.html();
 
-            Matcher matcher = pattern.matcher(divString);
-            if (matcher.find()){
-                System.out.println(matcher.group(1));
-                this.result = matcher.group(1);
-            }
-            */
             Log.d("result", this.result);
 
             //find way to get food item from barcode

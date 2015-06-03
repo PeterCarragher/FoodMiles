@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +19,8 @@ import com.google.android.maps.GeoPoint;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class DisplayProduct extends Activity {
@@ -28,8 +29,9 @@ public class DisplayProduct extends Activity {
     private TextView number;
     private Button add;
     private Button reject;
-    private double foodMiles_;
+    private float foodMiles_;
     private Location currentLocation;
+    String foodMiles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,8 +44,10 @@ public class DisplayProduct extends Activity {
         if(currentLocation == null){
             currentLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         }
+        String myLocation = "Latitude = " + currentLocation.getLatitude() + " Longitude = " + currentLocation.getLongitude();
 
-
+        //I make a log to see the results
+        Log.d("MY CURRENT LOCATION", myLocation);
 
         Intent i = getIntent();
         String postcode = i.getStringExtra("postcode");
@@ -55,10 +59,10 @@ public class DisplayProduct extends Activity {
         text.setText("Item: " + postcode);
 
         foodMiles_ = getDistance(currentLocation, postcode);
-        String foodMiles = String.valueOf((int)foodMiles_);
+        foodMiles = String.valueOf((int)foodMiles_);
         final double newTotal = oldTotal + foodMiles_;
         number = (TextView)findViewById(R.id.foodMiles);
-        number.setText("FoodMiles: " + foodMiles);
+        number.setText("FoodMiles: " + foodMiles); //for debug puposes
 
         add = (Button) findViewById(R.id.add_button);
         add.setOnClickListener(new View.OnClickListener() {
@@ -83,34 +87,7 @@ public class DisplayProduct extends Activity {
         });
 
     }
-/*
-    private final LocationListener mLocationListener = new LocationListener() {
 
-        public void onCreate(){
-
-        }
-        @Override
-        public void onStatusChanged(String x, int y, Bundle z) {
-            //your code here
-        }
-
-        @Override
-        public void onProviderEnabled(String x) {
-            //your code here
-        }
-
-        @Override
-        public void onProviderDisabled(String x) {
-            //your code here
-        }
-
-        @Override
-        public void onLocationChanged(final Location location) {
-            currentLocation = new Location(location);
-        }
-    };
-
-*/
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -130,15 +107,14 @@ public class DisplayProduct extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    double getDistance(Location shopLocation, String postcode){
-        float distance = 1;
-        GeoPoint foodGeoPoint = getLocationFromAddress(postcode);
+    float getDistance(Location shopLocation, String address){
+        GeoPoint foodGeoPoint = getLocationFromAddress(address);
+        //GeoPoint foodGeoPoint = new GeoPoint(getLocationFromAddress(address).getLatitudeE6(), getLocationFromAddress(address).getLongitudeE6());
         Location foodLocation = new Location(shopLocation);
         foodLocation.setLatitude(foodGeoPoint.getLatitudeE6());
         foodLocation.setLongitude(foodGeoPoint.getLongitudeE6());
-        distance = shopLocation.distanceTo(foodLocation);
-        return (double)distance*0.000621371192;
-
+        float distance = (float)(shopLocation.distanceTo(foodLocation)/1609.344);
+        return distance;
     }
 
     public GeoPoint getLocationFromAddress(String strAddress){
@@ -148,16 +124,34 @@ public class DisplayProduct extends Activity {
         List<Address> address;
         GeoPoint p1;
 
+        //Geocoder not working
+
         try {
-            address = coder.getFromLocationName("EH165BJ",1);
-          /*  if (address.isEmpty()) {
-                return null;
-            }*/
+            address = coder.getFromLocationName(strAddress,1);
+
+            if(address.isEmpty()){
+                //now try to use pattern matching to get a postcode
+                Pattern pattern = Pattern.compile("[A-Z]{1,2}[0-9R][0-9A-Z]? [0-9][ABD-HJLNP-UW-Z]{2}");
+                Matcher matcher = pattern.matcher(strAddress);
+                if(matcher.find()){
+                    String postcode = matcher.group(0);
+                    address = coder.getFromLocationName(postcode, 1);
+                }
+
+                if(address.isEmpty()) {
+                    //now try and slim down the address to just a city/town/country
+                    //any 4 words near the end should get a result
+
+                    if(address.isEmpty()) //if its still empty assign a random address
+                        address = coder.getFromLocationName("EH165BJ", 1);
+                }
+            }
+
             Address location = address.get(0);
             Log.d("Geo: Location", address.get(0).getAddressLine(0));
             Log.d("Geo: Location: Longitude", String.valueOf(address.get(0).getLongitude()));
             Log.d("Geo: Location: Latitude", String.valueOf(address.get(0).getLatitude()));
-            p1 = new GeoPoint((int)(address.get(0).getLatitude() * 1E6), (int)(address.get(0).getLongitude()*1E6));
+            p1 = new GeoPoint((int)(location.getLatitude() * 1E6), (int)(location.getLongitude()*1E6));
 
             return p1;
         }
@@ -168,37 +162,5 @@ public class DisplayProduct extends Activity {
 
     }
 
-    public class MyCurrentLoctionListener implements LocationListener {
-
-        @Override
-        public void onLocationChanged(Location location) {
-
-            currentLocation = new Location(location);
-
-            location.getLatitude();
-            location.getLongitude();
-
-            String myLocation = "Latitude = " + location.getLatitude() + " Longitude = " + location.getLongitude();
-
-            //I make a log to see the results
-            Log.e("MY CURRENT LOCATION", myLocation);
-
-        }
-
-        @Override
-        public void onStatusChanged(String s, int i, Bundle bundle) {
-
-        }
-
-        @Override
-        public void onProviderEnabled(String s) {
-
-        }
-
-        @Override
-        public void onProviderDisabled(String s) {
-
-        }
-    }
 
 }
